@@ -39,7 +39,7 @@ func TryCreate(db *sql.DB) {
 	}
 }
 
-func EmailEntryFromRow(row *sql.Rows) (*EmailEntry, error) {
+func emailEntryFromRow(row *sql.Rows) (*EmailEntry, error) {
 	var id int64
 	var email string
 	var confirmedAt int64
@@ -49,10 +49,123 @@ func EmailEntryFromRow(row *sql.Rows) (*EmailEntry, error) {
 
 	if err != nil {
 		log.Println(err)
-		return nil , err
+		return nil, err
 	}
 
-	t := time.Unix(confirmedAt,0)
+	t := time.Unix(confirmedAt, 0)
 
 	return &EmailEntry{id, email, &t, optOut}, nil
+}
+
+// Setting the Email in the DB
+func CreateEmail(db *sql.DB, email string) error {
+
+	_, err := db.Exec(`
+		INSERT INTO
+		emails(email, confirmed_at, opt_out)
+		VALUES(?, O, false)`, email)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// Getting the Email from the DB
+func GetEmailFromDB(db *sql.DB, email string) (*EmailEntry, error) {
+
+	rows, err := db.Query(`
+	SELECT id, email, confirmed_at , opt_out
+	FROM emails
+	WHERE email = ? `, email)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		return emailEntryFromRow(rows)
+	}
+
+	return nil, nil
+}
+
+// To update the email entry in Database
+func UpdateEmail(db *sql.DB, entry EmailEntry) error {
+
+	t := entry.ConfirmedAt.Unix()
+
+	_, err := db.Exec(`
+		INSERT INTO 
+		emails(email, confirmed_at, opt_out)
+		VALUES(?, ? ,?)
+		ON_CONFLICT(email) DO UPDATE SET
+			confirmed_at = ?
+			opt_out = ?`, entry.Email, t, entry.OptOut, t, entry.OptOut)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// To delete the email entry from Database
+func DeleteEmail(db *sql.DB, email string) error {
+
+	// Here instead of deleting we are setting it as opt_out = true
+	_, err := db.Exec(`
+	UPDATE emails SET opt_out=true WHERE email=?`, email)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+type GetEmailBatchQueryParams struct {
+	Page  int
+	Count int
+}
+
+func GetEmailBatchFromDB(db *sql.DB, params GetEmailBatchQueryParams) ([]EmailEntry, error) {
+
+	var emptyList []EmailEntry
+
+	rows, err := db.Query(`
+	SELECT id , email, confirmed_at , opt_out
+	FROM emails 
+	WHERE opt_out = false
+	ORDER BY id ASC
+	LIMIT ? OFFSET ?`, params.Count, (params.Page-1)*params.Count)
+
+	if err != nil {
+
+		log.Println(err)
+		return emptyList, err
+	}
+
+	defer rows.Close()
+
+	emails := make([]EmailEntry, 0, params.Count)
+
+	for rows.Next() {
+		email, err := emailEntryFromRow(rows)
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Here we derefernce above email and appened in the slice
+		emails = append(emails, *email)
+	}
+	return emails, nil
 }
