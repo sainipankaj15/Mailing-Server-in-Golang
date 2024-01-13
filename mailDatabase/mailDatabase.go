@@ -19,8 +19,8 @@ type EmailEntry struct {
 func TryCreate(db *sql.DB) {
 	_, err := db.Exec(`
 		CREATE TABLE emails (
-			id 			INTEGER PRIMARY KEY
-			email		TEXT UNIQUE
+			id 			INTEGER PRIMARY KEY,
+			email		TEXT UNIQUE,
 			confirmed_at INTEGER,
 			opt_out 	 INTEGER
 		)
