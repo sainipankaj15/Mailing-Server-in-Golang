@@ -17,6 +17,7 @@ type EmailEntry struct {
 
 // Will try to create a DB table
 func TryCreate(db *sql.DB) {
+
 	_, err := db.Exec(`
 		CREATE TABLE emails (
 			id 			INTEGER PRIMARY KEY,
@@ -31,7 +32,7 @@ func TryCreate(db *sql.DB) {
 		if ok {
 			// if code = 1 it means table already exists
 			if sqlError.Code == 1 {
-				log.Fatal(sqlError)
+				log.Println(sqlError)
 			} else {
 				log.Fatal(err)
 			}
@@ -59,11 +60,10 @@ func emailEntryFromRow(row *sql.Rows) (*EmailEntry, error) {
 
 // Setting the Email in the DB
 func CreateEmail(db *sql.DB, email string) error {
-
 	_, err := db.Exec(`
 		INSERT INTO
 		emails(email, confirmed_at, opt_out)
-		VALUES(?, O, false)`, email)
+		VALUES(?, 0, false)`, email)
 
 	if err != nil {
 		log.Println(err)
@@ -98,14 +98,19 @@ func GetEmailFromDB(db *sql.DB, email string) (*EmailEntry, error) {
 // To update the email entry in Database
 func UpdateEmail(db *sql.DB, entry EmailEntry) error {
 
-	t := entry.ConfirmedAt.Unix()
+	var t int64
+	if entry.ConfirmedAt != nil {
+	t = entry.ConfirmedAt.Unix()
+	}else{
+		t = 0
+	}
 
 	_, err := db.Exec(`
 		INSERT INTO 
 		emails(email, confirmed_at, opt_out)
 		VALUES(?, ? ,?)
-		ON_CONFLICT(email) DO UPDATE SET
-			confirmed_at = ?
+		ON CONFLICT(email) DO UPDATE SET
+			confirmed_at = ?,
 			opt_out = ?`, entry.Email, t, entry.OptOut, t, entry.OptOut)
 
 	if err != nil {
@@ -124,6 +129,7 @@ func DeleteEmail(db *sql.DB, email string) error {
 	UPDATE emails SET opt_out=true WHERE email=?`, email)
 
 	if err != nil {
+		log.Println("Error updating row:", err)
 		log.Println(err)
 		return err
 	}

@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "998dd0d0-16b4-4be3-91ed-516ad38e0805",
+		"name": "Mail Service Project in Golang",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19304978"
+	},
+	"item": [
+		{
+			"name": "GetEmail",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Email\":\"pankaj@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/email/get",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"email",
+						"get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createEmail",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Email\":\"pankaj@gmail.com2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/email/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"email",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetBatch",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"page\":1,\r\n    \"count\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/email/getbatch",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"email",
+						"getbatch"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateEmail",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Email\":\"pankaj@gmail.com\",\r\n    \"ConfirmedAt\": \"1971-01-01T05:30:00+05:30\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/email/update",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"email",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteEmail",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Email\":\"pankaj@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/email/delete",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"email",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -20,7 +20,7 @@ func main() {
 	arg.MustParse(&args)
 
 	if args.DbPath == "" {
-		args.DbPath = "list.db"
+		args.DbPath = "mailingList.db"
 	}
 	if args.BindJson == "" {
 		args.BindJson = ":8080"
@@ -36,6 +36,12 @@ func main() {
 
 	defer db.Close()
 
+	// Check if the connection is alive by executing a test query
+	if err := db.Ping(); err != nil {
+		log.Fatal("Error pinging database:", err)
+	}
+	log.Println("Connected to the database.")
+
 	mailDatabase.TryCreate(db)
 
 	var wg sync.WaitGroup
@@ -43,6 +49,7 @@ func main() {
 	wg.Add(1)
 
 	go func() {
+		defer wg.Done()
 		log.Println("Starting JSON API Server .......")
 		jsonapi.Serve(db, args.BindJson)
 	}()
